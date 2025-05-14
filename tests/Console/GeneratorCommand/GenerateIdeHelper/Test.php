@@ -30,6 +30,7 @@ class Test extends AbstractGeneratorCommand
         $this->assertStringContainsString('* @return \Custom_Fake_Class', $this->mockFilesystemOutput);
         $this->assertStringContainsString('public static function arr_custom_macro()', $this->mockFilesystemOutput);
         $this->assertStringContainsString('public static function db_custom_macro()', $this->mockFilesystemOutput);
+        $this->assertStringContainsString('return \Illuminate\Support\Arr::add', $this->mockFilesystemOutput);
     }
 
     public function testFilename(): void
