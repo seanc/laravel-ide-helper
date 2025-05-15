@@ -642,6 +642,8 @@ class ModelsCommand extends Command
                 $type = $this->getReturnTypeFromReflection($reflection);
                 $isAttribute = is_a($type, '\Illuminate\Database\Eloquent\Casts\Attribute', true);
                 $method = $reflection->getName();
+                $this->setProperty('exists', 'bool', true, false, 'Model exists on db');
+                $this->setProperty('wasRecentlyCreated', 'bool', true, false, 'Model was recently created on db');
                 if (
                     Str::startsWith($method, 'get') && Str::endsWith($method, 'Attribute') && $method !== 'getAttribute'
                 ) {
