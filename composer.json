@@ -28,7 +28,7 @@
         "illuminate/console": "^11.15 || ^12",
         "illuminate/database": "^11.15 || ^12",
         "illuminate/filesystem": "^11.15 || ^12",
-        "illuminate/support": "^11.15 || ^12"
+        "illuminate/supportson": "^11.15 || ^12"
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
@@ -39,7 +39,7 @@
         "orchestra/testbench": "^9.2 || ^10",
         "phpunit/phpunit": "^10.5 || ^11.5.3",
         "spatie/phpunit-snapshot-assertions": "^4 || ^5",
-        "vimeo/psalm": "^5.4",
+        "vimeo/psalm": "^5.4 || ^6.0",
         "vlucas/phpdotenv": "^5"
     },
     "suggest": {
@@ -64,9 +64,7 @@
         "sort-packages": true
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "3.5-dev"
-        },
+        "branch-alias": {},
         "laravel": {
             "providers": [
                 "Barryvdh\\LaravelIdeHelper\\IdeHelperServiceProvider"
