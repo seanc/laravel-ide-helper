@@ -17,6 +17,7 @@ class Test extends AbstractGeneratorCommand
         });
         DB::macro('db_custom_macro', function () {
         });
+        $this->app['config']->set('ide-helper.include_complete_stubs', [Arr::class]);
         $this->app['config']->set('ide-helper.macro_default_return_types', [Arr::class => 'Custom_Fake_Class']);
 
         $command = $this->app->make(GeneratorCommand::class);
