@@ -114,6 +114,7 @@ class ModelsCommand extends Command
 
     protected $write_model_magic_where;
     protected $write_model_relation_count_properties;
+    protected $write_model_relation_exists_properties;
     protected $properties = [];
     protected $methods = [];
     protected $write = false;
@@ -173,6 +174,8 @@ class ModelsCommand extends Command
         $this->write_model_external_builder_methods = $this->laravel['config']->get('ide-helper.write_model_external_builder_methods', true);
         $this->write_model_relation_count_properties =
             $this->laravel['config']->get('ide-helper.write_model_relation_count_properties', true);
+        $this->write_model_relation_exists_properties =
+            $this->laravel['config']->get('ide-helper.write_model_relation_exists_properties', false);
 
         $this->write = $this->write_mixin ? true : $this->write;
         //If filename is default and Write is not specified, ask what to do
@@ -410,9 +413,6 @@ class ModelsCommand extends Command
             $params = [];
 
             switch ($type) {
-                case 'encrypted':
-                    $realType = 'mixed';
-                    break;
                 case 'boolean':
                 case 'bool':
                     $realType = 'bool';
@@ -420,6 +420,7 @@ class ModelsCommand extends Command
                 case 'decimal':
                     $realType = 'numeric';
                     break;
+                case 'encrypted':
                 case 'string':
                 case 'hashed':
                     $realType = 'string';
@@ -475,7 +476,11 @@ class ModelsCommand extends Command
             }
 
             if (Str::startsWith($type, AsCollection::class)) {
-                $realType = $this->getTypeInModel($model, $params[0] ?? null) ?? '\Illuminate\Support\Collection';
+                $realType = $this->getTypeInModel($model, $params[0] ?? null) ?: '\Illuminate\Support\Collection';
+                $relatedModel = $this->getTypeInModel($model, $params[1] ?? null);
+                if ($relatedModel) {
+                    $realType = $this->getCollectionTypeHint($realType, $relatedModel);
+                }
             }
 
             if (Str::startsWith($type, AsEnumCollection::class)) {
@@ -637,6 +642,8 @@ class ModelsCommand extends Command
                 $type = $this->getReturnTypeFromReflection($reflection);
                 $isAttribute = is_a($type, '\Illuminate\Database\Eloquent\Casts\Attribute', true);
                 $method = $reflection->getName();
+                $this->setProperty('exists', 'bool', true, false, 'Model exists on db');
+                $this->setProperty('wasRecentlyCreated', 'bool', true, false, 'Model was recently created on db');
                 if (
                     Str::startsWith($method, 'get') && Str::endsWith($method, 'Attribute') && $method !== 'getAttribute'
                 ) {
@@ -813,6 +820,15 @@ class ModelsCommand extends Command
                                         $this->setProperty(
                                             Str::snake($method) . '_count',
                                             'int|null',
+                                            true,
+                                            false
+                                            // What kind of comments should be added to the relation count here?
+                                        );
+                                    }
+                                    if ($this->write_model_relation_exists_properties) {
+                                        $this->setProperty(
+                                            Str::snake($method) . '_exists',
+                                            'bool|null',
                                             true,
                                             false
                                             // What kind of comments should be added to the relation count here?
@@ -1407,7 +1423,7 @@ class ModelsCommand extends Command
         if (in_array('Illuminate\\Database\\Eloquent\\SoftDeletes', $traits)) {
             $modelName = $this->getClassNameInDestinationFile($model, get_class($model));
             $builder = $this->getClassNameInDestinationFile($model, \Illuminate\Database\Eloquent\Builder::class);
-            $this->setMethod('withTrashed', $builder . '<static>|' . $modelName, []);
+            $this->setMethod('withTrashed', $builder . '<static>|' . $modelName, ['bool $withTrashed = true']);
             $this->setMethod('withoutTrashed', $builder . '<static>|' . $modelName, []);
             $this->setMethod('onlyTrashed', $builder . '<static>|' . $modelName, []);
         }

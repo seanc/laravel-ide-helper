@@ -80,6 +80,9 @@ class Method
         //Get the parameters, including formatted default values
         $this->getParameters($method);
 
+        if (starts_with($method->name, 'scope') && $method->name != $methodName && !$method->hasReturnType() && !$this->phpdoc->hasTag('return')) {
+            $this->phpdoc->appendTag(Tag::createInstance("@return static"));
+        }
         //Make the method static
         $this->phpdoc->appendTag(Tag::createInstance('@static', $this->phpdoc));
     }
@@ -178,7 +181,7 @@ class Method
     /**
      * Get the parameters for this method
      *
-     * @param bool $implode Wether to implode the array or not
+     * @param bool $implode Whether to implode the array or not
      * @return string
      */
     public function getParams($implode = true)
@@ -208,7 +211,7 @@ class Method
     /**
      * Get the parameters for this method including default values
      *
-     * @param bool $implode Wether to implode the array or not
+     * @param bool $implode Whether to implode the array or not
      * @return string
      */
     public function getParamsWithDefault($implode = true)
