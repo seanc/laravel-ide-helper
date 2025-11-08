@@ -21,6 +21,7 @@ class Macro extends Method
      * @param array               $interfaces
      * @param array               $classAliases
      * @param array               $returnTypeNormalizers
+     * @param string|null         $returnTypeOverride
      */
     public function __construct(
         $method,
@@ -29,9 +30,10 @@ class Macro extends Method
         $methodName = null,
         $interfaces = [],
         $classAliases = [],
-        $returnTypeNormalizers = []
+        $returnTypeNormalizers = [],
+        $returnTypeOverride = null
     ) {
-        parent::__construct($method, $alias, $class, $methodName, $interfaces, $classAliases, $returnTypeNormalizers);
+        parent::__construct($method, $alias, $class, $methodName, $interfaces, $classAliases, $returnTypeNormalizers, [], $returnTypeOverride);
     }
 
     public static function setDefaultReturnTypes(array $map = [])

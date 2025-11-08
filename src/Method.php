@@ -38,6 +38,7 @@ class Method
     protected $root;
     protected $classAliases;
     protected $returnTypeNormalizers;
+    protected $returnTypeOverride;
 
     /** @var string[] */
     protected $templateNames = [];
@@ -51,13 +52,15 @@ class Method
      * @param array $classAliases
      * @param array $returnTypeNormalizers
      * @param string[] $templateNames
+     * @param string|null $returnTypeOverride
      */
-    public function __construct($method, $alias, $class, $methodName = null, $interfaces = [], array $classAliases = [], array $returnTypeNormalizers = [], array $templateNames = [])
+    public function __construct($method, $alias, $class, $methodName = null, $interfaces = [], array $classAliases = [], array $returnTypeNormalizers = [], array $templateNames = [], $returnTypeOverride = null)
     {
         $this->method = $method;
         $this->interfaces = $interfaces;
         $this->classAliases = $classAliases;
         $this->returnTypeNormalizers = $returnTypeNormalizers;
+        $this->returnTypeOverride = $returnTypeOverride;
         $this->name = $methodName ?: $method->name;
         $this->real_name = $method->isClosure() ? $this->name : $method->name;
         $this->templateNames = $templateNames;
@@ -293,17 +296,22 @@ class Method
         // Get the expanded type
         $returnValue = $tag->getType();
 
-        if (array_key_exists($returnValue, $this->returnTypeNormalizers)) {
-            $returnValue = $this->returnTypeNormalizers[$returnValue];
-        }
+        // Apply method-specific return type override if configured
+        if ($this->returnTypeOverride !== null) {
+            $returnValue = $this->returnTypeOverride;
+        } else {
+            if (array_key_exists($returnValue, $this->returnTypeNormalizers)) {
+                $returnValue = $this->returnTypeNormalizers[$returnValue];
+            }
 
-        if ($returnValue === '$this') {
-            $returnValue = $this->root;
-        }
+            if ($returnValue === '$this') {
+                $returnValue = $this->root;
+            }
 
-        // Replace the interfaces
-        foreach ($this->interfaces as $interface => $real) {
-            $returnValue = str_replace($interface, $real, $returnValue);
+            // Replace the interfaces
+            foreach ($this->interfaces as $interface => $real) {
+                $returnValue = str_replace($interface, $real, $returnValue);
+            }
         }
 
         // Set the changed content

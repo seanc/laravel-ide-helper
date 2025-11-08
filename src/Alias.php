@@ -392,7 +392,8 @@ class Alias
                         $this->interfaces,
                         $this->classAliases,
                         $this->getReturnTypeNormalizers($class),
-                        $this->getTemplateNames()
+                        $this->getTemplateNames(),
+                        $this->getMethodReturnTypeOverride($magic)
                     );
                 }
                 $this->usedMethods[] = $magic;
@@ -431,6 +432,7 @@ class Alias
                                 $this->classAliases,
                                 $this->getReturnTypeNormalizers($reflection),
                                 $this->getTemplateNames(),
+                                $this->getMethodReturnTypeOverride($methodName),
                             );
                         }
                         $this->usedMethods[] = $method->name;
@@ -459,7 +461,8 @@ class Alias
                             $macro_name,
                             $this->interfaces,
                             $this->classAliases,
-                            $this->getReturnTypeNormalizers($reflection)
+                            $this->getReturnTypeNormalizers($reflection),
+                            $this->getMethodReturnTypeOverride($macro_name)
                         );
                         $this->usedMethods[] = $macro_name;
                     }
@@ -481,6 +484,23 @@ class Alias
         }
 
         return [];
+    }
+
+    /**
+     * Get the return type override for a specific method
+     *
+     * @param string $methodName
+     * @return string|null
+     */
+    protected function getMethodReturnTypeOverride($methodName)
+    {
+        $overrides = $this->config->get('ide-helper.method_return_types', []);
+
+        if (isset($overrides[$this->alias][$methodName])) {
+            return $overrides[$this->alias][$methodName];
+        }
+
+        return null;
     }
 
     /**

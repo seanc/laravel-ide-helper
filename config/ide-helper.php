@@ -204,6 +204,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Method return type overrides
+    |--------------------------------------------------------------------------
+    |
+    | Override return types for specific methods on specific classes.
+    | Format: 'FacadeName' => ['methodName' => 'ReturnType']
+    |
+    */
+
+    'method_return_types' => [
+        // 'Request' => [
+        //     'user' => '\App\Models\User|null',
+        // ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Interface implementations
     |--------------------------------------------------------------------------
     |
