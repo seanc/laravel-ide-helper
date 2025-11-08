@@ -418,7 +418,7 @@ class Alias
                         // And don't add the __*() methods
                         if (($this->extends !== $class || $this->completeStub) && substr($method->name, 0, 2) !== '__') {
                             $methodName = $method->name;
-                            if (starts_with($methodName, 'scope') && (is_subclass_of($class, Model::class) || $class == Model::class)) {
+                            if (str_starts_with($methodName, 'scope') && (is_subclass_of($class, Model::class) || $class == Model::class)) {
                                 $methodName = lcfirst(substr($methodName, 5));
                             }
 
